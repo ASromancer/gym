@@ -328,9 +328,11 @@ def predict_body_fat(model, X_test):
     density = model.predict(X_test)
     fat = ((4.95/density[0]) - 4.5)*100
     return fat 
-data = models.Enquiry.objects.filter(pk=24).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
 
 def predict(request):  
+    user = request.user
+    data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
     msg = predict_body_fat(model, data)
     return render(request, 'user/predict.html', {'msg':msg})
+
 
