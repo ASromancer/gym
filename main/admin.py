@@ -87,3 +87,8 @@ admin.site.register(models.TrainerMsg,TrainerMsgAdmin)
 class AppSettingAdmin(admin.ModelAdmin):
 	list_display=('image_tag',)
 admin.site.register(models.AppSetting,AppSettingAdmin)
+
+#Fitness type
+class FitnessTypeAdmin(admin.ModelAdmin):
+	list_display=('type_name',)
+admin.site.register(models.fitness_type,FitnessTypeAdmin)

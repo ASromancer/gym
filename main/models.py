@@ -264,3 +264,9 @@ class AppSetting(models.Model):
 
 	def image_tag(self):
 		return mark_safe('<img src="%s" width="80" />' % (self.logo_img.url))
+
+class fitness_type(models.Model):
+	type_name = models.CharField(max_length=50)
+
+	class Meta:
+		verbose_name_plural='Fitness type'
