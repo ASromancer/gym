@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- Main Start -->
+    <main>
+		<!-- Services -->
+		<section class="container my-4">
+			<h1 class="text-center mb-4 section-heading border-bottom pb-2">Fitness_type:</h1>
+			<div class="row">
+				{% for fitness_type in fitness_types %}
+				<div class="col-md-4 mb-4">
+					<div class="card">
+					  <div class="card-body">
+					    <h5 class="card-title">{{fitness_type.type_name}}</h5>
+					    <a href="{% url 'fitness_ex' fitness_type.type_name %}" class="btn btn-primary">View All</a>
+					  </div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</section>
+		<!-- End -->
+    </main>
+    <!-- End -->
+{% endblock %}

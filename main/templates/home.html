@@ -52,7 +52,7 @@
 							<p><a href="{% url 'pagedetail' 1 %}" class="btn btn-info text-white">Read More</a></p>
 					</div>
 					<div class="col-md-6 offset-1">
-							<h1 class="mb-4 section-heading">Gallery <a href="#" class="float-end btn btn-info text-white mt-2">View All</a></h1>
+							<h1 class="mb-4 section-heading">Gallery</h1>
 							<div class="gallery">
 								{% for gimg in gimgs %}
 								<a href="{{gimg.img.url}}" data-lightbox="gallery"><img src="{{gimg.img.url}}" width="155" class="img-thumbnail" alt="{{gimg.alt_text}}"></a>

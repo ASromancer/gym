@@ -23,6 +23,8 @@ urlpatterns = [
 	path('enquiry',views.enquiry,name='enquiry'),
 	#bodyfat_predict
 	path('predict',views.predict,name='predict'),
+	path('fitness_type',views.fitness_type,name='fitness_type'),
+	path('fitness_ex/<type_name>',views.fitness_ex,name='fitness_ex'),
 	# Trainer Login
 	path('trainerlogin',views.trainerlogin,name='trainerlogin'),
 	path('trainerlogout',views.trainerlogout,name='trainerlogout'),

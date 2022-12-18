@@ -322,6 +322,8 @@ def enquiry(request):
 	form=forms.EnquiryForm
 	return render(request, 'user/enquiry.html',{'form':form,'msg':msg})
 
+#=====================================================================================================================================================================
+
 # BodyFat Prediction
 model = pickle.load(open('main/model.pkl', 'rb'))
 def predict_body_fat(model, X_test):
@@ -332,7 +334,77 @@ def predict_body_fat(model, X_test):
 def predict(request):  
     user = request.user
     data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
-    msg = predict_body_fat(model, data)
+    bmi = models.Enquiry.objects.get(enquiry_from_user_id=user).bmi
+    fat = predict_body_fat(model, data)
+    msg = get_body_type(fat, bmi)
     return render(request, 'user/predict.html', {'msg':msg})
+
+# =======body fat==================
+# essential = np.arange(2.0, 5.0)
+# athletes = np.arange(6.0, 13.0)
+# fitness = np.arange(14.0, 17.0)
+# average = np.arange(18.0, 24.0)
+# obese > 25.0
+
+# =======BMI=======================
+# underweight < 18.5
+# normal = np.arange(18.5, 24.9)
+# overweight = np.arange(25.0, 29.9)
+# obese = np.arange(30.0, 34.9)
+# extremely_obese > 35
+
+def get_bodyfat_category(x):
+    if 2.0 <= x <= 5.0:
+        return 1
+    elif 6.0 <= x <= 13.0:
+        return 2
+    elif 14.0 <= x <= 17.0:
+        return 3
+    elif 18.0 <= x <= 24.0:
+        return 4
+    else:
+        return 5
+
+def get_bmi_category(bmi):
+    if 0.0 < bmi < 18.5:
+        return 1
+    elif 18.5 <= bmi <= 24.9:
+        return 2
+    elif 25.0 <= bmi <= 29.9:
+        return 3
+    elif 30.0 <= bmi <= 39.9:
+        return 4
+    else:
+        return 5
+
+def get_body_type(fat, bmi):
+    fat = get_bodyfat_category(fat)
+    bmi = get_bmi_category(bmi)
+    if (fat in (2, 3, 4) and bmi == 2) or (fat == 2 and bmi == 3) or (fat == 3 and bmi == 4):
+        return 'A'
+    elif (fat in (2, 3) and bmi == 1) or (fat == 1 and bmi == 2):
+        return 'B'
+    elif (fat == 5 and bmi == 2) or (fat in (3, 4, 5) and bmi == 3) or (fat in (4, 5) and bmi == 4) or (
+            fat == 4 and bmi == 4):
+        return 'C'
+    elif fat == 1 and bmi == 1:
+        return 'D'
+    elif fat == 5 and bmi == 5:
+        return 'E'
+    else:
+        return 'None'
+
+# Show Exercies Type
+def fitness_type(request):
+	fitness_type=models.Fitness_type.objects.all().order_by('-type_name')
+	return render(request, 'user/fitness_type.html',{'fitness_types':fitness_type})
+
+# Show Exercies images
+def fitness_ex(request, type_name):
+	fitness_type=models.Fitness_type.objects.get(type_name=type_name)
+	fitness_ex_imgs=models.Fitness_exercises.objects.filter(type=fitness_type).order_by('-id')
+	return render(request, 'user/fitness_ex.html',{'fitness_ex_imgs':fitness_ex_imgs, 'fitness_type':fitness_type})
+
+
 
 

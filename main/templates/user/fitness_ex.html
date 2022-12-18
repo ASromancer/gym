@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- Main Start -->
+    <main>
+		<!-- Services -->
+		<section class="container my-4">
+			<div class="row">
+				{% for eimg in fitness_ex_imgs %}
+				<div class="col-md-4 mb-4">
+					<div class="card">
+					  <img src="{{eimg.exercise_img.url}}" class="card-img-top" alt="{{eimg.alt_text}}">
+					</div>
+					<h5 class="text-center mb-4 section-heading border-bottom pb-2">{{eimg.description}} Images</h1>
+				</div>
+				{% endfor %}
+			</div>
+		</section>
+		<!-- End -->
+    </main>
+    <!-- End -->
+{% endblock %}

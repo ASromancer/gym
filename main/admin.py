@@ -91,4 +91,9 @@ admin.site.register(models.AppSetting,AppSettingAdmin)
 #Fitness type
 class FitnessTypeAdmin(admin.ModelAdmin):
 	list_display=('type_name',)
-admin.site.register(models.fitness_type,FitnessTypeAdmin)
+admin.site.register(models.Fitness_type,FitnessTypeAdmin)
+
+#Fitness type
+class FitnessExercisesAdmin(admin.ModelAdmin):
+	list_display=('exercise_name','exercise_img','description',)
+admin.site.register(models.Fitness_exercises,FitnessExercisesAdmin)

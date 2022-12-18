@@ -259,14 +259,25 @@ class TrainerMsg(models.Model):
 	class Meta:
 		verbose_name_plural='Messages For Trainer'
 
+# App setting
 class AppSetting(models.Model):
 	logo_img=models.ImageField(upload_to='app_logos/')
 
 	def image_tag(self):
 		return mark_safe('<img src="%s" width="80" />' % (self.logo_img.url))
 
-class fitness_type(models.Model):
-	type_name = models.CharField(max_length=50)
+# Fitness type
+class Fitness_type(models.Model):
+	type_name = models.CharField(primary_key=True ,max_length=50)
 
 	class Meta:
 		verbose_name_plural='Fitness type'
+
+# Fitness Exercies
+class Fitness_exercises(models.Model):
+	exercise_name = models.CharField(max_length=50)
+	exercise_img = models.ImageField(upload_to="Fitness_exercises/")
+	description = models.TextField(null=True, blank=True)
+	type = models.ForeignKey(Fitness_type, on_delete=models.CASCADE,null=True)
+	class Meta:
+		verbose_name_plural='Fitness Exercies' 
