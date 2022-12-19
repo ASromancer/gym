@@ -9,29 +9,24 @@
 	<section class="container my-4">
 		<h1 class="text-center mb-4 section-heading border-bottom pb-2">Enquiry Form</h1>
 		<div class="row">
-			<div class="col-3">
+			<div class="col-md-3">
 				{% include 'user/left-sidebar.html' %}
 			</div>
-			<div class="col-md-6 m-auto">
+			<div class="col-md-9 m-auto">
 				{% if msg %}
 				<p class="text-success">{{msg}}</p>
 				{% endif %}
 				<form method="post" action="{% url 'enquiry' %}">
 					{% csrf_token %}
-					<!-- <table class="table table-bordered">
-							{{form.as_table}}
-							<tr>
-								<td colspan="2">
-									<input type="submit" class="btn btn-primary" />
-								</td>
-							</tr>
-						</table> -->
 					<div class="d-flex flex-wrap form-group">
 
 						<div class="row">
-							<div class="col-md">
+							<div class="col-md-3">
 								{{ form.age.label_tag}}
 								{% render_field form.age class="form-control" min=0 value=0%}
+
+								{{ form.date_modified.label_tag}}
+								{% render_field form.date_modified class="form-control" disabled=true%}
 
 								{{ form.weight.label_tag}}
 								{% render_field form.weight class="form-control" min=0 value=0%}
@@ -48,13 +43,10 @@
 								{{ form.abdomen.label_tag}}
 								{% render_field form.abdomen class="form-control" min=0 value=0%}
 
+							</div>
+							<div class="col-md-3">
 								{{ form.hip.label_tag}}
 								{% render_field form.hip class="form-control" min=0 value=0%}
-
-								
-
-							</div>
-							<div class="col-md">
 
 								{{ form.thigh.label_tag}}
 								{% render_field form.thigh class="form-control" min=0 value=0%}
@@ -74,24 +66,69 @@
 								{{ form.wrist.label_tag}}
 								{% render_field form.wrist class="form-control" min=0 value=0%}
 
-								{% render_field form.bmi class="form-control" min=0 value=0%}
+								{% render_field form.bmi class="form-control" min=0 value=0 hidden=true%}
+
 							</div>
 
-							<div class="col-md">
-								Your BMI: {{ bmi }}
+							<div class="col-md-6">
+								<div class="page-content page-container" id="page-content">
+									<div class="padding">
+										<div class="row">
+											<p class="text-primary mb-4 h2">Your BMI: {{ bmi }}</p>
+											<p class="text-success h5">Your Timeline</p>
+
+											<div class="timeline p-4 block mb-4">
+												{% for timeline in timelines %}
+												<div class="tl-item active">
+													<div class="tl-dot b-warning"></div>
+													<div class="tl-content">
+														<div class="text-primary" role="button"
+															hx-get="{% url 'show_timeline_info' timeline.date_modified%}"
+															hx-trigger="mouseup" hx-swap="innerHTML"
+															hx-target="#circumstances_info" data-toggle="modal"
+															data-target="#circumstances_modal">
+															{{timeline.date_modified|date:'Y-m-d H:i:s'}}</div>
+														<div class="tl-date text-muted mt-1">
+															BMI: {{timeline.bmi}}, Weight: {{timeline.weight}}, Height: {{timeline.height}}
+														</div>
+													</div>
+												</div>
+												{% endfor%}
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-
-
-
 					</div>
-
 					<button class="btn btn-success">Get your body fat (%)</button>
 				</form>
 			</div>
 		</div>
-	</section>
-	<!-- End -->
+		<!-- Modal -->
+		<div class="modal fade" id="circumstances_modal" tabindex="-1" role="dialog"
+			aria-labelledby="circumstances_modal" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Circumstances Info</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body" id="circumstances_info">
+
+						<!-- sau khi call ajax response sẽ được thay vô đây: thông tin các chỉ số của user tại timeline đó -->
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End -->
 </main>
+</section>
 <!-- End -->
 {% endblock %}

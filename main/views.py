@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.core import serializers
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.db.models import Count
 from . import models
 from . import forms
@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 from datetime import timedelta
+from django.utils.dateparse import parse_datetime
 
 # Create your views here.
 def home(request):
@@ -309,13 +310,10 @@ def mark_read_notif(request):
 # Enquiry
 def enquiry(request):
 	msg=''
+
 	if request.method=='POST':
 		form=forms.EnquiryForm(request.POST)
-		# w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('id')['weight']
-		# h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('id')['height']/100.0
-		# print(f'weight {w}, height {h}')
-		# form_bmi = round(w / (h * h), 2)
-
+		print(form.data)
 		if form.is_valid():
 			w = form.cleaned_data['weight']
 			h = form.cleaned_data['height']/100.0
@@ -328,13 +326,75 @@ def enquiry(request):
 			msg='Data has been saved'
 		else:
 			msg='Invalid Response!!'
-	# data = models.Enquiry.objects.get(enquiry_from_user=request.user)
-	user = models.Enquiry.objects.filter(enquiry_from_user=request.user).latest('id')
+
+	# lấy lịch sử chỉ số của user đó
+	timelines = models.Enquiry.objects.filter(enquiry_from_user=request.user).order_by('-date_modified').values('bmi', 'age', 'weight', 'height','date_modified')
+	user = models.Enquiry.objects.filter(enquiry_from_user=request.user).latest('date_modified')
 	form=forms.EnquiryForm(instance=user)
-	w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('id')['weight']
-	h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('id')['height']/100.0
+	w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('date_modified')['weight']
+	h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('date_modified')['height']/100.0
 	bmi = round(w / (h * h), 2)
-	return render(request, 'user/enquiry.html',{'form':form,'msg':msg, 'bmi': bmi})
+	return render(request, 'user/enquiry.html',{'form':form,'msg':msg, 'bmi': bmi, 'timelines':timelines})
+
+
+def show_timeline_info(request, enquiry_time):
+	time = parse_datetime(enquiry_time)
+	print('Time is ',time)
+	data = models.Enquiry.objects.get(date_modified=time)
+	if time != None:
+		time = time.strftime('%Y-%m-%d %H:%M:%S')
+	return HttpResponse(f'''
+		<div class="row">
+			<div class="h4 text-primary text-center">Datetime: {time}</div>
+		</div>
+		<div class="row">
+			<div class="col-md">
+				<label class="text-capitalize" for="age">age</label>
+				<input id="age" type="number" class="form-control" value={data.age} readonly/>
+
+				<label class="text-capitalize" for="weight">weight</label>
+				<input id="weight" type="number" class="form-control" value={data.weight} readonly/>
+
+				<label class="text-capitalize" for="height">height</label>
+				<input id="height" type="number" class="form-control" value={data.height} readonly/>
+
+				<label class="text-capitalize" for="neck">neck</label>
+				<input id="neck" type="number" class="form-control" value={data.neck} readonly/>
+
+				<label class="text-capitalize" for="chest">chest</label>
+				<input id="chest" type="number" class="form-control" value={data.chest} readonly/>
+
+				<label class="text-capitalize" for="abdomen">abdomen</label>
+				<input id="abdomen" type="number" class="form-control" value={data.abdomen} readonly/>
+
+				<label class="text-capitalize" for="hip">hip</label>
+				<input id="hip" type="number" class="form-control" value={data.hip} readonly/>
+			</div>
+			<div class="col-md">
+				<label class="text-capitalize" for="thigh">thigh</label>
+				<input id="thigh" type="number" class="form-control" value={data.thigh} readonly/>
+
+				<label class="text-capitalize" for="knee">knee</label>
+				<input id="knee" type="number" class="form-control" value={data.knee} readonly/>
+
+				<label class="text-capitalize" for="ankle">ankle</label>
+				<input id="ankle" type="number" class="form-control" value={data.ankle} readonly/>
+
+				<label class="text-capitalize" for="biceps">biceps</label>
+				<input id="biceps" type="number" class="form-control" value={data.biceps} readonly/>
+
+				<label class="text-capitalize" for="forearm">forearm</label>
+				<input id="forearm" type="number" class="form-control" value={data.forearm} readonly/>
+
+				<label class="text-capitalize" for="wrist">wrist</label>
+				<input id="wrist" type="number" class="form-control" value={data.wrist} readonly/>
+
+				<label class="text-capitalize" for="bmi">bmi</label>
+				<input id="bmi" type="number" class="form-control" value={data.bmi} readonly/>
+			</div>
+		</div>
+	''', time)
+	
 
 #=====================================================================================================================================================================
 
@@ -347,12 +407,10 @@ def predict_body_fat(model, X_test):
 
 def predict(request):  
     user = request.user
-    #data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
-    #bmi = models.Enquiry.objects.get(enquiry_from_user_id=user).bmi
-    data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('id')
-    bmi = models.Enquiry.objects.filter(enquiry_from_user_id=user).latest('id').bmi
+    data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('date_modified')
+    bmi = models.Enquiry.objects.filter(enquiry_from_user_id=user).latest('date_modified').bmi
     print(bmi)
-    fat = predict_body_fat(model, data)
+    fat = predict_body_fat(model, [data])
     msg = get_body_type(fat, bmi)
     return render(request, 'user/predict.html', {'msg':msg})
 

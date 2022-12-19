@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from . import views
+
 urlpatterns = [
     path('',views.home,name='home'),
 	path('pagedetail/<int:id>',views.page_detail,name='pagedetail'),
@@ -21,6 +22,7 @@ urlpatterns = [
 	path('user-dashboard',views.user_dashboard,name='user_dashboard'),
 	path('update-profile',views.update_profile,name='update_profile'),
 	path('enquiry',views.enquiry,name='enquiry'),
+	path('show_timeline_info/<str:enquiry_time>', views.show_timeline_info,name='show_timeline_info'),
 	#bodyfat_predict
 	path('predict',views.predict,name='predict'),
 	path('fitness_type',views.fitness_type,name='fitness_type'),

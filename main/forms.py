@@ -6,7 +6,7 @@ from . import models
 class EnquiryForm(forms.ModelForm):
 	class Meta:
 		model=models.Enquiry
-		fields=('age', 'weight', 'height' 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
+		fields=('age', 'date_modified', 'weight', 'height' 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
 		widgets = {'EnquiryForm': forms.HiddenInput()}
 		fields=("__all__")
 

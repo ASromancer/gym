@@ -18,7 +18,7 @@ class FaqAdmin(admin.ModelAdmin):
 admin.site.register(models.Faq,FaqAdmin)
 
 class EnquiryAdmin(admin.ModelAdmin):
-	list_display=('enquiry_from_user','age', 'weight', 'height', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
+	list_display=('id','enquiry_from_user', 'date_modified','age', 'weight', 'height', 'bmi')
 admin.site.register(models.Enquiry,EnquiryAdmin)
 
 class GalleryAdmin(admin.ModelAdmin):

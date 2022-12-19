@@ -7,6 +7,7 @@ from django.dispatch import receiver
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from datetime import datetime
 
 import json
 
@@ -57,6 +58,7 @@ class Faq(models.Model):
 # Enquiry Model
 class Enquiry(models.Model):
 	enquiry_from_user=models.ForeignKey(User, on_delete=models.CASCADE,null=True,related_name='report_from_user',blank=True)
+	date_modified = models.DateTimeField(default=datetime.now, blank=True)
 	age=models.IntegerField(null=True, blank=True)
 	weight=models.FloatField(null=True, blank=True)
 	height=models.FloatField(null=True, blank=True)
