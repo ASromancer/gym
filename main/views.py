@@ -308,19 +308,33 @@ def mark_read_notif(request):
 
 # Enquiry
 def enquiry(request):
-	user=request.user
 	msg=''
 	if request.method=='POST':
 		form=forms.EnquiryForm(request.POST)
+		# w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('id')['weight']
+		# h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('id')['height']/100.0
+		# print(f'weight {w}, height {h}')
+		# form_bmi = round(w / (h * h), 2)
+
 		if form.is_valid():
+			w = form.cleaned_data['weight']
+			h = form.cleaned_data['height']/100.0
+			form_bmi = round(w / (h * h), 2)
+			print(f'weight {w}, height {h}, bmi {form_bmi}')
 			new_form=form.save(commit=False)
-			new_form.enquiry_from_user=user
+			new_form.enquiry_from_user=request.user
+			new_form.bmi = form_bmi
 			new_form.save()
 			msg='Data has been saved'
 		else:
 			msg='Invalid Response!!'
-	form=forms.EnquiryForm
-	return render(request, 'user/enquiry.html',{'form':form,'msg':msg})
+	# data = models.Enquiry.objects.get(enquiry_from_user=request.user)
+	user = models.Enquiry.objects.filter(enquiry_from_user=request.user).latest('id')
+	form=forms.EnquiryForm(instance=user)
+	w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('id')['weight']
+	h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('id')['height']/100.0
+	bmi = round(w / (h * h), 2)
+	return render(request, 'user/enquiry.html',{'form':form,'msg':msg, 'bmi': bmi})
 
 #=====================================================================================================================================================================
 
@@ -333,8 +347,11 @@ def predict_body_fat(model, X_test):
 
 def predict(request):  
     user = request.user
-    data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
-    bmi = models.Enquiry.objects.get(enquiry_from_user_id=user).bmi
+    #data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi')
+    #bmi = models.Enquiry.objects.get(enquiry_from_user_id=user).bmi
+    data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('id')
+    bmi = models.Enquiry.objects.filter(enquiry_from_user_id=user).latest('id').bmi
+    print(bmi)
     fat = predict_body_fat(model, data)
     msg = get_body_type(fat, bmi)
     return render(request, 'user/predict.html', {'msg':msg})

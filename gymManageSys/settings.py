@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mathfilters',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'gymManageSys',
         'USER': 'postgres',
-        'PASSWORD': '31102001',
+        'PASSWORD': '12345',
         'HOST':'127.0.0.1',
         'POST':'5432',
     }

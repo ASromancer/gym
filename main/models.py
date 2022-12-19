@@ -58,6 +58,8 @@ class Faq(models.Model):
 class Enquiry(models.Model):
 	enquiry_from_user=models.ForeignKey(User, on_delete=models.CASCADE,null=True,related_name='report_from_user',blank=True)
 	age=models.IntegerField(null=True, blank=True)
+	weight=models.FloatField(null=True, blank=True)
+	height=models.FloatField(null=True, blank=True)
 	neck=models.FloatField(null=True, blank=True)
 	chest=models.FloatField(null=True, blank=True)
 	abdomen=models.FloatField(null=True, blank=True)
