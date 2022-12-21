@@ -285,3 +285,17 @@ class Fitness_exercises(models.Model):
 	type = models.ForeignKey(Fitness_type, on_delete=models.CASCADE,null=True)
 	class Meta:
 		verbose_name_plural='Fitness Exercies' 
+
+class Body_type(models.Model):
+	body_type = models.CharField(primary_key=True,max_length=50)
+	description = models.TextField(null=True, blank=True)
+	class Meta:
+		verbose_name_plural='Body types' 
+		
+# User Exercies
+class User_exercies(models.Model):
+	body_type = models.ForeignKey(Body_type, on_delete=models.CASCADE,null=True)
+	fitness_type = models.ForeignKey(Fitness_type, on_delete=models.CASCADE,null=True)
+	times = models.IntegerField(null=True, blank=True)
+	class Meta:
+		verbose_name_plural='User Exercies' 

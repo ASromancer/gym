@@ -412,7 +412,9 @@ def predict(request):
     print(bmi)
     fat = predict_body_fat(model, [data])
     msg = get_body_type(fat, bmi)
-    return render(request, 'user/predict.html', {'msg':msg})
+    body_type=models.Body_type.objects.all()
+    return render(request, 'user/predict.html' , {'msg':msg, 'body_types':body_type})
+
 
 # =======body fat==================
 # essential = np.arange(2.0, 5.0)
@@ -469,17 +471,41 @@ def get_body_type(fat, bmi):
     else:
         return 'None'
 
-# Show Exercies Type
+# Show Exercises Type
 def fitness_type(request):
 	fitness_type=models.Fitness_type.objects.all().order_by('-type_name')
 	return render(request, 'user/fitness_type.html',{'fitness_types':fitness_type})
 
-# Show Exercies images
+# Show Exercises images
 def fitness_ex(request, type_name):
 	fitness_type=models.Fitness_type.objects.get(type_name=type_name)
 	fitness_ex_imgs=models.Fitness_exercises.objects.filter(type=fitness_type).order_by('-id')
 	return render(request, 'user/fitness_ex.html',{'fitness_ex_imgs':fitness_ex_imgs, 'fitness_type':fitness_type})
 
+
+# Show Exercies types
+def user_exercises_type(request, body_type):
+	body_type=models.Body_type.objects.get(body_type=body_type)
+	user_exercises_type = models.User_exercies.objects.filter(body_type=body_type).values('fitness_type_id') 
+	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'user_exercises_types':user_exercises_type})
+
+# # Show Exercies for each types
+# def user_exercises(request, type_name):
+# 	user_exercises_type = models.User_exercies.objects.filter(body_type=body_type).values_list('fitness_type_id') 
+# 	ex_types = []
+# 	for x in user_exercises_type:
+# 		(y,) = x
+# 		ex_types.append(y)
+		
+# 	user_exercises = []
+# 	for i in ex_types:
+# 		y = models.Fitness_exercises.objects.filter(type=i)
+# 		user_exercises.append(y)
+# 	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'fitness_types':fitness_type, 'user_exercises_types':user_exercises_type, 'user_exercises': user_exercises})
+
+def user_exercises(request, type_name):
+	fitness_ex=models.Fitness_exercises.objects.filter(type = type_name).order_by('-id')
+	return render(request, 'user/user_excercises.html',{'fitness_ex':fitness_ex})
 
 
 

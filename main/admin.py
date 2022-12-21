@@ -88,12 +88,23 @@ class AppSettingAdmin(admin.ModelAdmin):
 	list_display=('image_tag',)
 admin.site.register(models.AppSetting,AppSettingAdmin)
 
-#Fitness type
+# Fitness type
 class FitnessTypeAdmin(admin.ModelAdmin):
 	list_display=('type_name',)
 admin.site.register(models.Fitness_type,FitnessTypeAdmin)
 
-#Fitness type
+# Fitness type
 class FitnessExercisesAdmin(admin.ModelAdmin):
 	list_display=('exercise_name','exercise_img','description',)
 admin.site.register(models.Fitness_exercises,FitnessExercisesAdmin)
+
+# Body type
+class BodyTypeAdmin(admin.ModelAdmin):
+	list_display=('body_type','description')
+admin.site.register(models.Body_type,BodyTypeAdmin)
+
+# User Exercies
+class UserExerciesAdmin(admin.ModelAdmin):
+	list_display=('body_type','fitness_type','times',)
+admin.site.register(models.User_exercies,UserExerciesAdmin)
+

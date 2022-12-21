@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Main Start -->
+<main>
+	<!-- Services -->
+	<section class="container my-4">
+		<h1 class="text-center mb-4 section-heading border-bottom pb-2">Choose what you wanna be:</h1>
+		<div class="row d-flex justify-content-center mt-4">
+            {% for body_type in body_types %}
+			<div class="col-md-4">
+                <a href="{% url 'fitness_ex' body_type.body_type %}">
+                    <div class="col-md-4">
+                        <div data-aos="flip-left">
+                            <h4 class="text-center"><strong>{{body_type.body_type}}</strong></h4>
+                            <hr>
+                            <div class="profile-card-6"><img
+                                    src="/media/trainers/306552171_478260857704116_6233681961026526118_n.jpg"
+                                    class="img img-responsive body-type-img">
+                                <div class="profile-name">JOHN
+                                    <br>DOE
+                                </div>
+                                <div class="profile-position">Lorem Ipsum Donor</div>
+                                <div class="profile-overview">
+                                    <div class="profile-overview">
+                                        <div class="row text-center">
+                                            <div class="col-xs-4">
+                                                <h3>1</h3>
+                                                <p>Rank</p>
+                                            </div>
+                                            <div class="col-xs-4">
+                                                <h3>50</h3>
+                                                <p>Matches</p>
+                                            </div>
+                                            <div class="col-xs-4">
+                                                <h3>35</h3>
+                                                <p>Goals</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        
+                            </div>
+                        </div>
+                    </div>
+                </a>
+			</div>		
+            {% endfor %}		
+		</div>
+	</section>
+	<!-- End -->
+</main>
+<!-- End -->
+{% endblock %}
+
+

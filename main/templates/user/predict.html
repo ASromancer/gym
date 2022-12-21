@@ -1,26 +1,58 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <!-- Main Start -->
-    <main>
-		<!-- Services -->
-		<section class="container my-4">
-			<h1 class="text-center mb-4 section-heading border-bottom pb-2">Your Timeline</h1>
-			<div class="row">	
-				<div class="col-md-6">
-					Your body type is:
-					{{msg}}
-				</div>
-				<p>Here is some excercies for you:</p>
-			</div>
-			<div class="card" style="width: 18rem;">
-				<img class="" alt="Card image cap">
-				<div class="card-body">
-				  <p class="card-text">hhhh</p>
-				</div>
-			  </div>
-		</section>
-		<!-- End -->
-    </main>
-    <!-- End -->
+<!-- Main Start -->
+<main>
+	<!-- Services -->
+	<section class="container my-4">
+		<h1 class="text-center mb-4 section-heading border-bottom pb-2">Choose what you wanna be:</h1>
+		<div class="row d-flex justify-content-center mt-5">
+            {% for body_type in body_types %}
+                
+                    <div class="col-md-4">
+                        <div data-aos="flip-left">
+                            <h4 class="text-center"><strong>{{body_type.body_type}}</strong></h4>
+                            <hr>			
+							<a class="profile-card-6" href="{% url 'userexcercisestype' body_type.body_type %}">			
+								<div >
+									<img
+										src="/media/trainers/306552171_478260857704116_6233681961026526118_n.jpg"
+										class="img img-responsive body-type-img">
+									
+									<div class="profile-name">
+										{{body_type.body_type}}
+									</div>
+									<div class="profile-position">Lorem Ipsum Donor</div>
+									<div class="profile-overview">
+										<div class="profile-overview">
+											<div class="row text-center">
+												<div class="col-xs-4">
+													<h3>1</h3>
+													<p>Rank</p>
+												</div>
+												<div class="col-xs-4">
+													<h3>50</h3>
+													<p>Matches</p>
+												</div>
+												<div class="col-xs-4">
+													<h3>35</h3>
+													<p>Goals</p>
+												</div>
+											</div>
+										</div>
+									</div>
+			
+								</div>
+							</a>
+							
+                        </div>
+                    </div>
+            {% endfor %}		
+		</div>
+	</section>
+	<!-- End -->
+</main>
+<!-- End -->
 {% endblock %}
+
+

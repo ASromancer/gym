@@ -23,10 +23,13 @@ urlpatterns = [
 	path('update-profile',views.update_profile,name='update_profile'),
 	path('enquiry',views.enquiry,name='enquiry'),
 	path('show_timeline_info/<str:enquiry_time>', views.show_timeline_info,name='show_timeline_info'),
-	#bodyfat_predict
+	# bodyfat_predict
 	path('predict',views.predict,name='predict'),
 	path('fitness_type',views.fitness_type,name='fitness_type'),
 	path('fitness_ex/<type_name>',views.fitness_ex,name='fitness_ex'),
+	# type choosing
+	path('userexcercisestype/<body_type>',views.user_exercises_type,name='userexcercisestype'),
+	path('userexcercises/<type_name>',views.user_exercises,name='userexcercises'),
 	# Trainer Login
 	path('trainerlogin',views.trainerlogin,name='trainerlogin'),
 	path('trainerlogout',views.trainerlogout,name='trainerlogout'),
