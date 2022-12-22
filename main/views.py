@@ -393,8 +393,64 @@ def show_timeline_info(request, enquiry_time):
 				<input id="bmi" type="number" class="form-control" value={data.bmi} readonly/>
 			</div>
 		</div>
-	''', time)
-	
+	''')
+
+
+def show_latest_info(request):
+	user = request.user
+	data = models.Enquiry.objects.latest('date_modified')
+	return HttpResponse(
+		f'''
+		<div class="row">
+			<div class="col-md">
+				<label class="text-capitalize" for="age">age</label>
+				<input id="age" type="number" class="form-control" value={data.age} readonly/>
+
+				<label class="text-capitalize" for="weight">weight</label>
+				<input id="weight" type="number" class="form-control" value={data.weight} readonly/>
+
+				<label class="text-capitalize" for="height">height</label>
+				<input id="height" type="number" class="form-control" value={data.height} readonly/>
+
+				<label class="text-capitalize" for="neck">neck</label>
+				<input id="neck" type="number" class="form-control" value={data.neck} readonly/>
+
+				<label class="text-capitalize" for="chest">chest</label>
+				<input id="chest" type="number" class="form-control" value={data.chest} readonly/>
+
+				<label class="text-capitalize" for="abdomen">abdomen</label>
+				<input id="abdomen" type="number" class="form-control" value={data.abdomen} readonly/>
+
+				<label class="text-capitalize" for="hip">hip</label>
+				<input id="hip" type="number" class="form-control" value={data.hip} readonly/>
+			</div>
+			<div class="col-md">
+				<label class="text-capitalize" for="thigh">thigh</label>
+				<input id="thigh" type="number" class="form-control" value={data.thigh} readonly/>
+
+				<label class="text-capitalize" for="knee">knee</label>
+				<input id="knee" type="number" class="form-control" value={data.knee} readonly/>
+
+				<label class="text-capitalize" for="ankle">ankle</label>
+				<input id="ankle" type="number" class="form-control" value={data.ankle} readonly/>
+
+				<label class="text-capitalize" for="biceps">biceps</label>
+				<input id="biceps" type="number" class="form-control" value={data.biceps} readonly/>
+
+				<label class="text-capitalize" for="forearm">forearm</label>
+				<input id="forearm" type="number" class="form-control" value={data.forearm} readonly/>
+
+				<label class="text-capitalize" for="wrist">wrist</label>
+				<input id="wrist" type="number" class="form-control" value={data.wrist} readonly/>
+
+				<label class="text-capitalize" for="bmi">bmi</label>
+				<input id="bmi" type="number" class="form-control" value={data.bmi} readonly/>
+			</div>
+		</div>
+	'''
+	)
+
+
 
 #=====================================================================================================================================================================
 
@@ -403,17 +459,18 @@ model = pickle.load(open('main/model.pkl', 'rb'))
 def predict_body_fat(model, X_test):
     density = model.predict(X_test)
     fat = ((4.95/density[0]) - 4.5)*100
-    return fat 
+    return fat
 
 def predict(request):  
     user = request.user
     data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('date_modified')
     bmi = models.Enquiry.objects.filter(enquiry_from_user_id=user).latest('date_modified').bmi
-    print(bmi)
-    fat = predict_body_fat(model, [data])
+    if bmi != None:
+       bmi = round(bmi , 2)
+    fat = round(predict_body_fat(model, [data]), 2)
     msg = get_body_type(fat, bmi)
     body_type=models.Body_type.objects.all()
-    return render(request, 'user/predict.html' , {'msg':msg, 'body_types':body_type})
+    return render(request, 'user/predict.html' , {'msg':msg, 'body_types':body_type, 'fat':fat, "bmi": bmi})
 
 
 # =======body fat==================
@@ -488,24 +545,57 @@ def user_exercises_type(request, body_type):
 	body_type=models.Body_type.objects.get(body_type=body_type)
 	user_exercises_type = models.User_exercies.objects.filter(body_type=body_type).values('fitness_type_id') 
 	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'user_exercises_types':user_exercises_type})
+	# bodyType_content = '''<section class="container my-4" id="userFitness"><div class="row">'''
 
-# # Show Exercies for each types
-# def user_exercises(request, type_name):
-# 	user_exercises_type = models.User_exercies.objects.filter(body_type=body_type).values_list('fitness_type_id') 
-# 	ex_types = []
-# 	for x in user_exercises_type:
-# 		(y,) = x
-# 		ex_types.append(y)
-		
-# 	user_exercises = []
-# 	for i in ex_types:
-# 		y = models.Fitness_exercises.objects.filter(type=i)
-# 		user_exercises.append(y)
-# 	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'fitness_types':fitness_type, 'user_exercises_types':user_exercises_type, 'user_exercises': user_exercises})
+	# for ex_type in user_exercises_type:
+	# 	bodyType_content += (f'''
+	# 		<div class="col-md-4 mb-4">
+	# 			<div class="card">
+	# 				<div class="card-body">
+	# 				<h5 class="card-title text-capitalize">{ex_type.get('fitness_type_id')}</h5>
+	# 				<div
+	# 					hx-get="/userexcercises/{ex_type.get('fitness_type_id')}"
+	# 					hx-trigger="click"
+	# 					hx-swap="innerHTML"
+	# 					hx-target="#userFitness"
+						
+	# 					href="#" class="btn btn-primary">View All</div>
+	# 				</div>
+	# 			</div>
+	# 		</div>
+	# 	''')
+
+
+	# bodyType_content.join('''</div></section>''')
+
+	# return HttpResponse(bodyType_content)
+
 
 def user_exercises(request, type_name):
 	fitness_ex=models.Fitness_exercises.objects.filter(type = type_name).order_by('-id')
 	return render(request, 'user/user_excercises.html',{'fitness_ex':fitness_ex})
+
+	# exercise_content = f'''
+	# 	<a 
+	# 	href="/predict" class="btn btn-primary mb-4" role="button">Back</a>
+	# '''
+	# exercise_content += '''<div class="row">'''
+	
+
+	# for exercise in fitness_ex:
+	# 	exercise_content += (f'''
+	# 		<div class="col-md-4 mb-4">
+	# 			<div class="card">
+	# 				<img src="{exercise.exercise_img.url}" class="card-img-top" alt="">
+	# 			</div>
+	# 			<h5 class="text-center mb-4 section-heading border-bottom pb-2">{exercise.exercise_name}</h1>
+	# 		</div>
+	# 	''')
+
+	# exercise_content.join('''</div>''')
+
+	
+	# return HttpResponse(exercise_content)
 
 
 

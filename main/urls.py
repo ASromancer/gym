@@ -23,6 +23,7 @@ urlpatterns = [
 	path('update-profile',views.update_profile,name='update_profile'),
 	path('enquiry',views.enquiry,name='enquiry'),
 	path('show_timeline_info/<str:enquiry_time>', views.show_timeline_info,name='show_timeline_info'),
+	path('showLatestInfo', views.show_latest_info, name='showLatestInfo'),
 	# bodyfat_predict
 	path('predict',views.predict,name='predict'),
 	path('fitness_type',views.fitness_type,name='fitness_type'),

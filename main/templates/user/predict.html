@@ -4,55 +4,77 @@
 <!-- Main Start -->
 <main>
 	<!-- Services -->
-	<section class="container my-4">
-		<h1 class="text-center mb-4 section-heading border-bottom pb-2">Choose what you wanna be:</h1>
+	<section class="container my-4" id="">
+		<div class="">Fat percentages: {{fat}}</div>
+		<div class="">BMI: {{bmi}}</div>
+		<div hx-get="/showLatestInfo" hx-swap="innerHTML" hx-trigger="click" hx-target="#circumstances_info"
+			data-target="#circumstances_modal" data-toggle="modal" class="btn btn-primary" role="button">View more</div>
+		<h1 class="text-center h3 mb-5">Choose what you want to be</h1>
 		<div class="row d-flex justify-content-center mt-5">
-            {% for body_type in body_types %}
-                
-                    <div class="col-md-4">
-                        <div data-aos="flip-left">
-                            <h4 class="text-center"><strong>{{body_type.body_type}}</strong></h4>
-                            <hr>			
-							<a class="profile-card-6" href="{% url 'userexcercisestype' body_type.body_type %}">			
-								<div >
-									<img
-										src="/media/trainers/306552171_478260857704116_6233681961026526118_n.jpg"
-										class="img img-responsive body-type-img">
-									
-									<div class="profile-name">
-										{{body_type.body_type}}
-									</div>
-									<div class="profile-position">Lorem Ipsum Donor</div>
-									<div class="profile-overview">
-										<div class="profile-overview">
-											<div class="row text-center">
-												<div class="col-xs-4">
-													<h3>1</h3>
-													<p>Rank</p>
-												</div>
-												<div class="col-xs-4">
-													<h3>50</h3>
-													<p>Matches</p>
-												</div>
-												<div class="col-xs-4">
-													<h3>35</h3>
-													<p>Goals</p>
-												</div>
-											</div>
+			{% for body_type in body_types %}
+			<div class="col-md-4">
+				<div data-aos="flip-left">
+					<hr>
+					<a class="profile-card-6" href="{% url 'userexcercisestype' body_type.body_type %}">
+						<div>
+							<img src="/media/trainers/306552171_478260857704116_6233681961026526118_n.jpg"
+								class="img img-responsive body-type-img">
+
+							<div class="profile-name">
+								{{body_type.body_type}}
+							</div>
+							<div class="profile-position">Lorem Ipsum Donor</div>
+							<div class="profile-overview">
+								<div class="profile-overview">
+									<div class="row text-center">
+										<div class="col-xs-4">
+											<h3>1</h3>
+											<p>Rank</p>
+										</div>
+										<div class="col-xs-4">
+											<h3>50</h3>
+											<p>Matches</p>
+										</div>
+										<div class="col-xs-4">
+											<h3>35</h3>
+											<p>Goals</p>
 										</div>
 									</div>
-			
 								</div>
-							</a>
-							
-                        </div>
-                    </div>
-            {% endfor %}		
+							</div>
+						</div>
+					</a>
+				</div>
+			</div>
+			{% endfor %}
 		</div>
+
+
+		<!-- Modal -->
+		<div class="modal fade" id="circumstances_modal" tabindex="-1" role="dialog"
+			aria-labelledby="circumstances_modal" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Circumstances Info</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body" id="circumstances_info">
+
+						<!-- sau khi call ajax response sẽ được thay vô đây: thông tin các chỉ số của user tại timeline đó -->
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End -->
 	</section>
 	<!-- End -->
 </main>
 <!-- End -->
 {% endblock %}
-
-
