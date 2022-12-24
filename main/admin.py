@@ -93,14 +93,14 @@ class FitnessTypeAdmin(admin.ModelAdmin):
 	list_display=('type_name',)
 admin.site.register(models.Fitness_type,FitnessTypeAdmin)
 
-# Fitness type
+# Fitness Exercises
 class FitnessExercisesAdmin(admin.ModelAdmin):
-	list_display=('exercise_name','exercise_img','description',)
+	list_display=('exercise_name','exercise_img','type', 'times')
 admin.site.register(models.Fitness_exercises,FitnessExercisesAdmin)
 
 # Body type
 class BodyTypeAdmin(admin.ModelAdmin):
-	list_display=('body_type','description')
+	list_display=('body_type','description', )
 admin.site.register(models.Body_type,BodyTypeAdmin)
 
 # User Exercies

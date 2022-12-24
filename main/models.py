@@ -270,7 +270,7 @@ class AppSetting(models.Model):
 	def image_tag(self):
 		return mark_safe('<img src="%s" width="80" />' % (self.logo_img.url))
 
-# Fitness type
+# Fitness type 
 class Fitness_type(models.Model):
 	type_name = models.CharField(primary_key=True ,max_length=50)
 
@@ -281,7 +281,7 @@ class Fitness_type(models.Model):
 class Fitness_exercises(models.Model):
 	exercise_name = models.CharField(max_length=50)
 	exercise_img = models.ImageField(upload_to="Fitness_exercises/")
-	description = models.TextField(null=True, blank=True)
+	times = models.IntegerField(null=True, blank=True)
 	type = models.ForeignKey(Fitness_type, on_delete=models.CASCADE,null=True)
 	class Meta:
 		verbose_name_plural='Fitness Exercies' 
@@ -289,6 +289,18 @@ class Fitness_exercises(models.Model):
 class Body_type(models.Model):
 	body_type = models.CharField(primary_key=True,max_length=50)
 	description = models.TextField(null=True, blank=True)
+	neck=models.FloatField(null=True, blank=True)
+	chest=models.FloatField(null=True, blank=True)
+	abdomen=models.FloatField(null=True, blank=True)
+	hip=models.FloatField(null=True, blank=True)
+	thigh=models.FloatField(null=True, blank=True)
+	knee=models.FloatField(null=True, blank=True)
+	ankle=models.FloatField(null=True, blank=True)
+	biceps=models.FloatField(null=True, blank=True)
+	forearm=models.FloatField(null=True, blank=True)
+	wrist=models.FloatField(null=True, blank=True)
+	bmi=models.FloatField(null=True, blank=True)
+	fat=models.FloatField(null=True, blank=True)
 	class Meta:
 		verbose_name_plural='Body types' 
 		

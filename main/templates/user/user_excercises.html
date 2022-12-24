@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mathfilters %}
 {% block content %}
 <!-- Main Start -->
 <main>
@@ -12,7 +13,7 @@
 				<div class="card" style="width: 200px;height: 250px;">
 					<img src="{{eimg.exercise_img.url}}" class="card-img-top" alt="{{eimg.alt_text}}">
 					<div class="card-body">
-						<div class="card-title text-center">{{eimg.exercise_name}}</div>
+						<div class="card-title text-center">{{eimg.exercise_name}}, {{ratio|floatformat|mul:eimg.times}} times </div>
 					</div>
 				</div>
 			</div>

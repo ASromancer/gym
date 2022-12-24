@@ -472,6 +472,8 @@ def predict(request):
     body_type=models.Body_type.objects.all()
     return render(request, 'user/predict.html' , {'msg':msg, 'body_types':body_type, 'fat':fat, "bmi": bmi})
 
+# Calculate percentage of user
+
 
 # =======body fat==================
 # essential = np.arange(2.0, 5.0)
@@ -528,6 +530,41 @@ def get_body_type(fat, bmi):
     else:
         return 'None'
 
+def get_correclation_coefficient(user_body_type, choosed_body_type):
+	if user_body_type == 'A' and choosed_body_type == 'Slim':
+		return 1.1
+	elif user_body_type == 'A' and choosed_body_type == 'Normal':
+		return 0.95
+	elif user_body_type == 'A' and choosed_body_type == 'Muscular':
+		return 1.31
+	elif user_body_type == 'B' and choosed_body_type == 'Slim':
+		return 0.82
+	elif user_body_type == 'B' and choosed_body_type == 'Normal':
+		return 0.7
+	elif user_body_type == 'B' and choosed_body_type == 'Muscular':
+		return 0.97
+	elif user_body_type == 'C' and choosed_body_type == 'Slim':
+		return 1.32
+	elif user_body_type == 'C' and choosed_body_type == 'Normal':
+		return 1.14
+	elif user_body_type == 'C' and choosed_body_type == 'Muscular':
+		return 1.56
+	elif user_body_type == 'D' and choosed_body_type == 'Slim':
+		return 0.53
+	elif user_body_type == 'D' and choosed_body_type == 'Normal':
+		return 0.45
+	elif user_body_type == 'D' and choosed_body_type == 'Muscular':
+		return 0.63
+	elif user_body_type == 'E' and choosed_body_type == 'Slim':
+		return 0.82
+	elif user_body_type == 'E' and choosed_body_type == 'Normal':
+		return 0.7
+	elif user_body_type == 'E' and choosed_body_type == 'Muscular':
+		return 0.97
+	else:
+		return 0
+	
+
 # Show Exercises Type
 def fitness_type(request):
 	fitness_type=models.Fitness_type.objects.all().order_by('-type_name')
@@ -544,7 +581,52 @@ def fitness_ex(request, type_name):
 def user_exercises_type(request, body_type):
 	body_type=models.Body_type.objects.get(body_type=body_type)
 	user_exercises_type = models.User_exercies.objects.filter(body_type=body_type).values('fitness_type_id') 
+
+	# user parameter calculate
+	user = request.user
+	data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('date_modified')
+	fat = round(predict_body_fat(model, [data]), 2)
+	para = []
+	for i in data:
+		para.append(i)
+	para.pop(0)
+	#para.append(fat)
+	#ideal=models.Body_type.objects.get(body_type=body_type)
+	ideal_para = []
+	ideal_para.append(body_type.neck)
+	ideal_para.append(body_type.chest)
+	ideal_para.append(body_type.abdomen)
+	ideal_para.append(body_type.hip)
+	ideal_para.append(body_type.thigh)
+	ideal_para.append(body_type.knee)
+	ideal_para.append(body_type.ankle)
+	ideal_para.append(body_type.biceps)
+	ideal_para.append(body_type.forearm)
+	ideal_para.append(body_type.wrist)
+	ideal_para.append(body_type.bmi)
+	#ideal_para.append(body_type.fat)
+
+	ratio = []
+
+	for i in range(0,len(para)):
+		ratio.append(para[i]/ideal_para[i])
+	
+	sum_ratio = 0
+	for i in range(0,len(ratio)):
+		sum_ratio += ratio[i]
+
+	sum_ratio = sum_ratio/len(ratio)
+	# get_correclation_coefficient
+	bmi = para[-1]
+	user_body_type = get_body_type(fat,bmi)
+	fat_ratio = get_correclation_coefficient(user_body_type,body_type.body_type)
+	ratio = (sum_ratio + fat_ratio*3)/4
+	request.session['token'] = ratio 
 	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'user_exercises_types':user_exercises_type})
+	
+
+
+	
 	# bodyType_content = '''<section class="container my-4" id="userFitness"><div class="row">'''
 
 	# for ex_type in user_exercises_type:
@@ -573,7 +655,8 @@ def user_exercises_type(request, body_type):
 
 def user_exercises(request, type_name):
 	fitness_ex=models.Fitness_exercises.objects.filter(type = type_name).order_by('-id')
-	return render(request, 'user/user_excercises.html',{'fitness_ex':fitness_ex})
+	ratio = request.session['token']
+	return render(request, 'user/user_excercises.html',{'fitness_ex':fitness_ex, 'ratio':ratio})
 
 	# exercise_content = f'''
 	# 	<a 
@@ -596,6 +679,5 @@ def user_exercises(request, type_name):
 
 	
 	# return HttpResponse(exercise_content)
-
 
 
