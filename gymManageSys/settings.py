@@ -84,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'gymManageSys',
         'USER': 'postgres',
-        'PASSWORD': '12345',
+        'PASSWORD': '31102001',
         'HOST':'127.0.0.1',
         'POST':'5432',
     }

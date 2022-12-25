@@ -273,7 +273,7 @@ class AppSetting(models.Model):
 # Fitness type 
 class Fitness_type(models.Model):
 	type_name = models.CharField(primary_key=True ,max_length=50)
-
+	fitness_type_img = models.ImageField(upload_to="fitness_type/", blank=True)
 	class Meta:
 		verbose_name_plural='Fitness type'
 

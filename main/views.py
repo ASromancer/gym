@@ -657,8 +657,14 @@ def fitness_ex(request, type_name):
 # Show Exercies types
 def user_exercises_type(request, body_type):
 	body_type=models.Body_type.objects.get(body_type=body_type)
-	user_exercises_type = models.User_exercies.objects.filter(body_type=body_type).values('fitness_type_id') 
-
+	u_e_t = models.User_exercies.objects.filter(body_type=body_type).values_list('fitness_type_id')
+	user_exercises_type =[]
+	for x in u_e_t:
+		user_exercises_type.extend(x)
+	img_dic = {}
+	for x_img in user_exercises_type:
+		img_dic[x_img] = (models.Fitness_type.objects.get(type_name = x_img).fitness_type_img.url) 
+	print(img_dic)
 	# user parameter calculate
 	user = request.user
 	data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('date_modified')
@@ -699,7 +705,7 @@ def user_exercises_type(request, body_type):
 	fat_ratio = get_correclation_coefficient(user_body_type,body_type.body_type)
 	times_ratio = (sum_ratio + fat_ratio*3)/4
 	request.session['token'] = times_ratio 
-	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'user_exercises_types':user_exercises_type})
+	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'user_exercises_types':user_exercises_type, 'img_dic': img_dic})
 	
 
 

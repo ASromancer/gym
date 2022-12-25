@@ -6,14 +6,14 @@
 		<section class="container my-4" id="">
 			<h1 class="text-center h3 mb-5">Fitness type</h1>
 			<div class="row">
-				{% for user_exercises_type in user_exercises_types %}
+				{% for type_name,img_url in img_dic.items %}
 				<div class="col-md-4 mb-4">
 					<div class="card">
 					  <div class="card-body">
-					    <h5 class="card-title text-capitalize">{{user_exercises_type.fitness_type_id}}</h5>
+					    <h5 class="card-title text-capitalize">{{type_name}}</h5>
+						<img src="{{img_url}}" style = "width : 200px; height : 200px;" class="card-img-top">
 					    <a
-							
-							href="{% url 'userexcercises' user_exercises_type.fitness_type_id %}" class="btn btn-primary">View All</a>
+							href="{% url 'userexcercises' type_name %}" class="btn btn-primary">View All</a>
 					  </div>
 					</div>
 				</div>

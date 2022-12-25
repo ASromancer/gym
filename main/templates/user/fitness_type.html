@@ -11,6 +11,7 @@
 					<div class="card">
 					  <div class="card-body">
 					    <h5 class="card-title text-capitalize">{{fitness_type.type_name}}</h5>
+						<img src="{{fitness_type.fitness_type_img.url}}" class="card-img-top">
 					    <a href="{% url 'fitness_ex' fitness_type.type_name %}" class="btn btn-primary">View All</a>
 					  </div>
 					</div>

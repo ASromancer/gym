@@ -90,7 +90,7 @@ admin.site.register(models.AppSetting,AppSettingAdmin)
 
 # Fitness type
 class FitnessTypeAdmin(admin.ModelAdmin):
-	list_display=('type_name',)
+	list_display=('type_name','fitness_type_img',)
 admin.site.register(models.Fitness_type,FitnessTypeAdmin)
 
 # Fitness Exercises
