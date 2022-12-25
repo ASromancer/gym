@@ -100,7 +100,7 @@ admin.site.register(models.Fitness_exercises,FitnessExercisesAdmin)
 
 # Body type
 class BodyTypeAdmin(admin.ModelAdmin):
-	list_display=('body_type','description', )
+	list_display=('body_type', 'body_type_img' ,'description', )
 admin.site.register(models.Body_type,BodyTypeAdmin)
 
 # User Exercies

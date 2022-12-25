@@ -288,6 +288,7 @@ class Fitness_exercises(models.Model):
 
 class Body_type(models.Model):
 	body_type = models.CharField(primary_key=True,max_length=50)
+	body_type_img = models.ImageField(upload_to="body_type/", blank=True)
 	description = models.TextField(null=True, blank=True)
 	neck=models.FloatField(null=True, blank=True)
 	chest=models.FloatField(null=True, blank=True)

@@ -117,31 +117,36 @@ def pay_cancel(request):
 
 # User Dashboard Section Start
 def user_dashboard(request):
-	current_plan=models.Subscription.objects.get(user=request.user)
-	my_trainer=models.AssignSubscriber.objects.get(user=request.user)
-	enddate=current_plan.reg_date + timedelta(days=current_plan.plan.validity_days)  # type: ignore
+	try:
+		current_plan=models.Subscription.objects.get(user=request.user)
+		my_trainer=models.AssignSubscriber.objects.get(user=request.user)
+	except:
+		msg_err = "You haven't assigned to any trainer!"
+		return render(request, 'user/dashboard.html', {'msg_err' : msg_err})
+	else:
+		enddate=current_plan.reg_date + timedelta(days=current_plan.plan.validity_days)  # type: ignore
 
-	# Notification
-	data=models.Notify.objects.all().order_by('-id')
-	notifStatus=False
-	jsonData=[]
-	totalUnread=0
-	for d in data:
-		try:
-			notifStatusData=models.NotifUserStatus.objects.get(user=request.user,notif=d)
-			if notifStatusData:
-				notifStatus=True
-		except models.NotifUserStatus.DoesNotExist:
-			notifStatus=False
-		if not notifStatus:
-			totalUnread=totalUnread+1
+		# Notification
+		data=models.Notify.objects.all().order_by('-id')
+		notifStatus=False
+		jsonData=[]
+		totalUnread=0
+		for d in data:
+			try:
+				notifStatusData=models.NotifUserStatus.objects.get(user=request.user,notif=d)
+				if notifStatusData:
+					notifStatus=True
+			except models.NotifUserStatus.DoesNotExist:
+				notifStatus=False
+			if not notifStatus:
+				totalUnread=totalUnread+1
 
-	return render(request, 'user/dashboard.html',{
-		'current_plan':current_plan,
-		'my_trainer':my_trainer,
-		'total_unread':totalUnread,
-		'enddate':enddate
-	})
+		return render(request, 'user/dashboard.html',{
+			'current_plan':current_plan,
+			'my_trainer':my_trainer,
+			'total_unread':totalUnread,
+			'enddate':enddate
+		})
 	
 # Edit Profile Form
 def update_profile(request):
@@ -329,12 +334,20 @@ def enquiry(request):
 
 	# lấy lịch sử chỉ số của user đó
 	timelines = models.Enquiry.objects.filter(enquiry_from_user=request.user).order_by('-date_modified').values('bmi', 'age', 'weight', 'height','date_modified')
-	user = models.Enquiry.objects.filter(enquiry_from_user=request.user).latest('date_modified')
-	form=forms.EnquiryForm(instance=user)
-	w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('date_modified')['weight']
-	h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('date_modified')['height']/100.0
-	bmi = round(w / (h * h), 2)
-	return render(request, 'user/enquiry.html',{'form':form,'msg':msg, 'bmi': bmi, 'timelines':timelines})
+	try:
+		user = models.Enquiry.objects.filter(enquiry_from_user=request.user).latest('date_modified')
+	except:
+		form = forms.EnquiryForm()
+		msg = 'There is no data about your circumstance, please update your data!'
+		return render(request, 'user/enquiry.html', {'form':form, 'msg': msg})
+	else:
+		form=forms.EnquiryForm(instance=user)
+		w = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('weight').latest('date_modified')['weight']
+		h = models.Enquiry.objects.filter(enquiry_from_user=request.user).values('height').latest('date_modified')['height']/100.0
+		bmi = round(w / (h * h), 2)
+		return render(request, 'user/enquiry.html',{'form':form,'msg':msg, 'bmi': bmi, 'timelines':timelines})
+		
+
 
 
 def show_timeline_info(request, enquiry_time):
@@ -463,31 +476,87 @@ def predict_body_fat(model, X_test):
 
 def predict(request):  
     user = request.user
-    data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('date_modified')
-    bmi = models.Enquiry.objects.filter(enquiry_from_user_id=user).latest('date_modified').bmi
-    if bmi != None:
-       bmi = round(bmi , 2)
-    fat = round(predict_body_fat(model, [data]), 2)
-    msg = get_body_type(fat, bmi)
-    body_type=models.Body_type.objects.all()
-    return render(request, 'user/predict.html' , {'msg':msg, 'body_types':body_type, 'fat':fat, "bmi": bmi})
+    try:
+        data = models.Enquiry.objects.filter(enquiry_from_user_id=user).values_list('age', 'neck', 'chest', 'abdomen', 'hip', 'thigh', 'knee', 'ankle', 'biceps', 'forearm', 'wrist', 'bmi').latest('date_modified')
+        bmi = models.Enquiry.objects.filter(enquiry_from_user_id=user).latest('date_modified').bmi
+    except:
+        msg_err = 'Please back to update your circumstance data!'
+        return render(request, 'user/predict.html', {'msg_err': msg_err})
+    else:
+        if bmi != None:
+           bmi = round(bmi , 2)
+        fat = round(predict_body_fat(model, [data]), 2)
+        body_type_code = get_body_type(fat, bmi)
+        body_type_name = get_name_of_body_type(body_type_code)
+        body_types=models.Body_type.objects.all()
+
+
+        ratios = {}
+
+        para = []
+        for i in data:
+                para.append(i)
+        para.pop(0)
+
+	    # tính hệ số bài tập của từng ideal body type so với currently
+        for body_type in body_types:
+                ideal_para = []
+                ideal_para.append(body_type.neck)
+                ideal_para.append(body_type.chest)
+                ideal_para.append(body_type.abdomen)
+                ideal_para.append(body_type.hip)
+                ideal_para.append(body_type.thigh)
+                ideal_para.append(body_type.knee)
+                ideal_para.append(body_type.ankle)
+                ideal_para.append(body_type.biceps)
+                ideal_para.append(body_type.forearm)
+                ideal_para.append(body_type.wrist)
+                ideal_para.append(body_type.bmi)
+	            #ideal_para.append(body_type.fat)
+
+                ratio = []
+
+                for i in range(0,len(para)):
+                                ratio.append(para[i]/ideal_para[i])
+
+                sum_ratio = 0
+                for i in range(0,len(ratio)):
+                                sum_ratio += ratio[i]
+
+                sum_ratio=sum_ratio/len(ratio)
+                # get_correclation_coefficient
+                bmi = para[-1]
+                user_body_type = get_body_type(fat,bmi)
+                fat_ratio = get_correclation_coefficient(user_body_type,body_type.body_type)
+                times_ratio = round(100*((sum_ratio + fat_ratio*3)/4))
+                type_name = body_type.body_type
+                ratios[type_name] = times_ratio
+
+        print(ratios)
+        min_ratio= min(ratios.values())
+        max_ratio= max(ratios.values())
+
+        return render(request, 'user/predict.html' , {'body_type_name':body_type_name, 
+												'body_types':body_types, 'fat':fat, "bmi": bmi, 'ratios': ratios,
+												'min_ratio': min_ratio, 'max_ratio': max_ratio})
+    
 
 # Calculate percentage of user
 
 
 # =======body fat==================
-# essential = np.arange(2.0, 5.0)
-# athletes = np.arange(6.0, 13.0)
-# fitness = np.arange(14.0, 17.0)
-# average = np.arange(18.0, 24.0)
-# obese > 25.0
+# 1 essential = np.arange(2.0, 5.0)
+# 2 athletes = np.arange(6.0, 13.0)
+# 3 fitness = np.arange(14.0, 17.0)
+# 4 average = np.arange(18.0, 24.0)
+# 5 obese > 25.0
 
 # =======BMI=======================
-# underweight < 18.5
-# normal = np.arange(18.5, 24.9)
-# overweight = np.arange(25.0, 29.9)
-# obese = np.arange(30.0, 34.9)
-# extremely_obese > 35
+# 1 underweight < 18.5
+# 2 normal = np.arange(18.5, 24.9)
+# 3 overweight = np.arange(25.0, 29.9)
+# 4 obese = np.arange(30.0, 34.9)
+# 5 extremely_obese > 35
 
 def get_bodyfat_category(x):
     if 2.0 <= x <= 5.0:
@@ -508,7 +577,7 @@ def get_bmi_category(bmi):
         return 2
     elif 25.0 <= bmi <= 29.9:
         return 3
-    elif 30.0 <= bmi <= 39.9:
+    elif 30.0 <= bmi <= 34.9:
         return 4
     else:
         return 5
@@ -520,15 +589,23 @@ def get_body_type(fat, bmi):
         return 'A'
     elif (fat in (2, 3) and bmi == 1) or (fat == 1 and bmi == 2):
         return 'B'
-    elif (fat == 5 and bmi == 2) or (fat in (3, 4, 5) and bmi == 3) or (fat in (4, 5) and bmi == 4) or (
-            fat == 4 and bmi == 4):
+    elif (fat == 5 and bmi == 2) or (fat in (3, 4, 5) and bmi == 3) or (fat in (4, 5) and bmi == 4) or (fat == 4 and bmi == 4):
         return 'C'
     elif fat == 1 and bmi == 1:
         return 'D'
     elif fat == 5 and bmi == 5:
         return 'E'
-    else:
-        return 'None'
+
+def get_name_of_body_type(body_type_code):
+	bodyTypeNameDict = {
+		'A': 'Normal',
+		'B': 'Slightly thinner',
+		'C': 'slightly fatter',
+		'D': 'A lot thinner',
+		'E': 'A lot fatter'
+	}
+
+	return bodyTypeNameDict[body_type_code]
 
 def get_correclation_coefficient(user_body_type, choosed_body_type):
 	if user_body_type == 'A' and choosed_body_type == 'Slim':
@@ -556,11 +633,11 @@ def get_correclation_coefficient(user_body_type, choosed_body_type):
 	elif user_body_type == 'D' and choosed_body_type == 'Muscular':
 		return 0.63
 	elif user_body_type == 'E' and choosed_body_type == 'Slim':
-		return 0.82
+		return 1.53
 	elif user_body_type == 'E' and choosed_body_type == 'Normal':
-		return 0.7
+		return 1.32
 	elif user_body_type == 'E' and choosed_body_type == 'Muscular':
-		return 0.97
+		return 1.81
 	else:
 		return 0
 	
@@ -620,8 +697,8 @@ def user_exercises_type(request, body_type):
 	bmi = para[-1]
 	user_body_type = get_body_type(fat,bmi)
 	fat_ratio = get_correclation_coefficient(user_body_type,body_type.body_type)
-	ratio = (sum_ratio + fat_ratio*3)/4
-	request.session['token'] = ratio 
+	times_ratio = (sum_ratio + fat_ratio*3)/4
+	request.session['token'] = times_ratio 
 	return render(request, 'user/user_exercises_type.html',{ 'body_type':body_type, 'user_exercises_types':user_exercises_type})
 	
 
